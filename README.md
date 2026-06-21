@@ -1,6 +1,6 @@
 # [WIP] Nextzy Gamification - Backend (Server)
 
-ระบบส่วนหลัง (Backend) สำหรับโปรเจกต์ Nextzy Gamification พัฒนาด้วย NestJS และ Prisma ORM โดยมุ่งเน้นที่ความปลอดภัยของข้อมูลและรองรับการขยายตัว
+ระบบส่วนหลังบ้าน (Backend) สำหรับโปรเจกต์ Nextzy Gamification พัฒนาด้วย NestJS และ Prisma ORM โดยมุ่งเน้นที่ความปลอดภัยของข้อมูลและรองรับการขยายตัว
 
 Repository ฝั่ง Frontend (Next.js): [Link to Frontend Repository](https://github.com/weerayosong/nextzy-game-client)
 
@@ -33,7 +33,7 @@ Repository ฝั่ง Frontend (Next.js): [Link to Frontend Repository](https:
 1. โคลนโปรเจกต์และเข้าสู่โฟลเดอร์
 
 ```bash
-git clone <server-repo-url>
+git clone https://github.com/weerayosong/nextzy-game-server
 cd nextzy-game-server
 ```
 

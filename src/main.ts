@@ -3,6 +3,16 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+
+  // เปิดอนุญาตให้ Frontend (พอร์ต 3000) สามารถดึงข้อมูลได้
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
+
+  // เปลี่ยน Backend ให้ไปรันที่พอร์ต 3001 แทน
+  await app.listen(process.env.PORT ?? 3001);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Error durin application startup:', err);
+});
