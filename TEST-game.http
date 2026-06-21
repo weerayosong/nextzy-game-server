@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:3001
+# id from TEST-auth.http
+@myUserId = c2c0f2fd-452d-4f68-a88f-d46a82e116cb
+
+
+### ------------------------------------------------
+### 1. ทดสอบหมุนวงล้อ 10,20,50,100
+### ------------------------------------------------
+POST {{baseUrl}}/game/spin
+Content-Type: application/json
+
+{
+  "userId": "{{myUserId}}"
+}

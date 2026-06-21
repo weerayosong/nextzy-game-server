@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class GameService {
-  create(createGameDto: CreateGameDto) {
-    return 'This action adds a new game';
-  }
+  constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return `This action returns all game`;
-  }
+  async spin(userId: string) {
+    // 1. ตรวจสอบว่าผู้เล่นมีตัวตนมั้ย
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} game`;
-  }
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-  update(id: number, updateGameDto: UpdateGameDto) {
-    return `This action updates a #${id} game`;
-  }
+    // 2. เทสสุ่มคะแนน (eg. 10, 20, 50, 100)
+    const pointsList = [10, 20, 50, 100];
+    const rewardPoints =
+      pointsList[Math.floor(Math.random() * pointsList.length)];
 
-  remove(id: number) {
-    return `This action removes a #${id} game`;
+    // 3. ใช้ Transaction เพื่อจัดการข้อมูล 2 ตารางพร้อมกัน
+    const result = await this.prisma.$transaction(async (tx) => {
+      // 3.1 เพิ่มคะแนนรวมให้ผู้เล่น
+      const updatedUser = await tx.user.update({
+        where: { id: userId },
+        data: {
+          totalPoints: {
+            increment: rewardPoints,
+          },
+        },
+      });
+
+      // 3.2 บันทึกประวัติการหมุนวงล้อ
+      const history = await tx.spinHistory.create({
+        data: {
+          userId: userId,
+          pointsReceived: rewardPoints,
+        },
+      });
+
+      return { totalPoints: updatedUser.totalPoints, history };
+    });
+
+    // 4. ส่งผลลัพธ์กลับไปให้ Frontend
+    return {
+      message: 'Spin successful!',
+      rewardPoints: rewardPoints,
+      currentTotalPoints: result.totalPoints,
+    };
   }
 }
