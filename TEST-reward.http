@@ -1,0 +1,15 @@
+@baseUrl = http://localhost:3001
+# เอา id คะแนนเกิน 500 มาใส่
+@myUserId = c2c0f2fd-452d-4f68-a88f-d46a82e116cb
+
+
+### ------------------------------------------------
+### ทดสอบรับรางวัลcheckpoint 500 คะแนน, status 201กดครั้งแรก/400เคยรับแล้ว
+### ------------------------------------------------
+POST {{baseUrl}}/reward/claim
+Content-Type: application/json
+
+{
+  "userId": "{{myUserId}}",
+  "checkpoint": 500
+}
