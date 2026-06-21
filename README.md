@@ -68,7 +68,7 @@ npm run start:dev
 
 ```
 
-API จะเปิดให้บริการที่ `http://localhost:3000`
+API จะเปิดให้บริการที่ `http://localhost:3001`
 
 ## บันทึกจากนักพัฒนา (Developer's Note)
 

@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateHistoryDto } from './dto/create-history.dto';
-import { UpdateHistoryDto } from './dto/update-history.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class HistoryService {
-  create(createHistoryDto: CreateHistoryDto) {
-    return 'This action adds a new history';
-  }
+  constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return `This action returns all history`;
-  }
+  async getUserHistory(userId: string) {
+    // 1. ตรวจผู้เล่นและดึงคะแนนรวม
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { nickname: true, totalPoints: true }, // เลือกดึงมาเฉพาะฟิลด์ที่จำเป็น
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} history`;
-  }
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-  update(id: number, updateHistoryDto: UpdateHistoryDto) {
-    return `This action updates a #${id} history`;
-  }
+    // 2. ดึงประวัติการหมุนวงล้อ desc-เรียงจากใหม่ไปเก่า และจำกัดแค่ 50 รายการล่าสุดเพื่อลดภาระเซิร์ฟเวอร์
+    const spinHistory = await this.prisma.spinHistory.findMany({
+      where: { userId: userId },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} history`;
+    // 3. ดึงประวัติการรับรางวัล desc-เรียงจากใหม่ไปเก่า
+    const rewardClaims = await this.prisma.rewardClaim.findMany({
+      where: { userId: userId },
+      orderBy: { claimedAt: 'desc' },
+    });
+
+    // 4. ส่งข้อมูลทั้งหมดกลับไปเป็นก้อนเดียว
+    return {
+      user,
+      spinHistory,
+      rewardClaims,
+    };
   }
 }
