@@ -6,7 +6,7 @@ Repository ฝั่ง Frontend (Next.js): [Link to Frontend Repository](https:
 
 ## การออกแบบระบบและสถาปัตยกรรม (System Design & Software Architecture)
 
-[Link to Documentation](https://subtle-pastelito-35134b.netlify.app)
+[Link to Documentation](https://incandescent-crumble-d59b5c.netlify.app)
 
 โปรเจกต์นี้ออกแบบโครงสร้างตามมาตรฐานของ NestJS และ Clean Architecture:
 

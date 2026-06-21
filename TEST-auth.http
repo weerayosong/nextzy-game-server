@@ -32,3 +32,18 @@ Content-Type: application/json
 {
   "nickname": ""
 }
+
+### ------------------------------------------------
+### 4. after seed test
+### ------------------------------------------------
+POST http://localhost:3001/auth/login
+Content-Type: application/json
+
+{
+  "nickname": "Letha_OConnell48"
+}
+
+### ------------------------------------------------
+### 4. after seed test 2
+### ------------------------------------------------
+GET http://localhost:3001/history/e1942347-f219-47fc-ab54-45a1fe4e30a7
