@@ -56,4 +56,33 @@ export class RewardService {
       claim,
     };
   }
+
+  // ดึงข้อมูลการรับรางวัลแบบ limit pagination
+  async getRewardHistory(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.rewardClaim.findMany({
+        where: { userId: userId },
+        skip: skip,
+        take: limit,
+        orderBy: { claimedAt: 'desc' },
+      }),
+      this.prisma.rewardClaim.count({
+        where: { userId: userId },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+  }
 }

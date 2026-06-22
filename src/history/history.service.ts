@@ -1,39 +1,57 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class HistoryService {
   constructor(private prisma: PrismaService) {}
 
-  async getUserHistory(userId: string) {
-    // 1. ตรวจผู้เล่นและดึงคะแนนรวม
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { nickname: true, totalPoints: true }, // เลือกดึงมาเฉพาะฟิลด์ที่จำเป็น
-    });
+  // ดึงประวัติแบบรวมของทุกคน (โชว์ชื่อคนเล่นด้วย)
+  async getGlobalHistory(page: number, limit: number) {
+    const skip = (page - 1) * limit;
 
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.spinHistory.findMany({
+        skip: skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: {
+            select: { nickname: true }, // ดึงมาแค่ชื่อ จะได้ไม่ส่งข้อมูลอื่นหลุดไป
+          },
+        },
+      }),
+      this.prisma.spinHistory.count(),
+    ]);
 
-    // 2. ดึงประวัติการหมุนวงล้อ desc-เรียงจากใหม่ไปเก่า และจำกัดแค่ 50 รายการล่าสุดเพื่อลดภาระเซิร์ฟเวอร์
-    const spinHistory = await this.prisma.spinHistory.findMany({
-      where: { userId: userId },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
-    });
+    const totalPages = Math.ceil(total / limit);
 
-    // 3. ดึงประวัติการรับรางวัล desc-เรียงจากใหม่ไปเก่า
-    const rewardClaims = await this.prisma.rewardClaim.findMany({
-      where: { userId: userId },
-      orderBy: { claimedAt: 'desc' },
-    });
-
-    // 4. ส่งข้อมูลทั้งหมดกลับไปเป็นก้อนเดียว
     return {
-      user,
-      spinHistory,
-      rewardClaims,
+      data,
+      meta: { total, page, limit, totalPages },
+    };
+  }
+
+  // ดึงประวัติเฉพาะของ User คนนั้น
+  async getPersonalHistory(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.spinHistory.findMany({
+        where: { userId: userId },
+        skip: skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.spinHistory.count({
+        where: { userId: userId },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: { total, page, limit, totalPages },
     };
   }
 }
