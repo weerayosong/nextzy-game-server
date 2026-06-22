@@ -16,7 +16,7 @@ export class GameService {
     }
 
     // 2. เทสสุ่มคะแนน (eg. 10, 20, 50, 100)
-    const pointsList = [10, 20, 50, 100];
+    const pointsList = [300, 500, 1000, 3000];
     const rewardPoints =
       pointsList[Math.floor(Math.random() * pointsList.length)];
 
