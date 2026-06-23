@@ -44,6 +44,11 @@ Content-Type: application/json
 }
 
 ### ------------------------------------------------
-### 4. after seed test 2
+### 5. after seed test 2
 ### ------------------------------------------------
 GET http://localhost:3001/history/e1942347-f219-47fc-ab54-45a1fe4e30a7
+
+### ------------------------------------------------
+### 6. global filter test
+### ------------------------------------------------
+GET http://localhost:3001/api/where-is-my-reward
